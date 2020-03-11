@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Organizer</string>
+    <string name="reminder_title_hint">Reminder title.</string>
+    <string name="reminder_title_label">Title</string>
+    <string name="reminder_details_label">Details</string>
+    <string name="reminder_solved_label">Solved</string>
+    <string name="reminder_title">Reminder Title</string>
+    <string name="reminder_date">Reminder Date</string>
+    <string name="date_picker_title">Choose time of notification</string>
+    <string name="time_fialog_title">Choose time</string>
+    <string name="new_reminder">Create</string>
+    <string name="list_is_empty">List is empty</string>
+    <string name="send_reminder">Send reminder</string>
+    <string name="choose_contact">Choose Contact</string>
+    <string name="reminder_no_contact">no contact</string>
+    <string name="reminder_report_contact">name is %s \n</string>
+    <string name="reminder_report_contact_number"> telephone %s.</string>
+    <string name="send_report">Send from Reminder: </string>
+    <string name="reminder_report">Reminder</string>
+    <string name="call_to_contact">Call</string>
+    <string name="take_photo">Take photo</string>
+</resources>

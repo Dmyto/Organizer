@@ -1,6 +1,7 @@
 package com.example.organizer.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -33,7 +34,23 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
     private RecyclerView reminderRecyclerView;
     private ReminderAdapter reminderAdapter;
     private ItemTouchHelper mItemTouchHelper;
+    private Callbacks mCallbacks;
 
+    public interface Callbacks {
+        void onCrimeSelected(Reminder reminder);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,11 +68,9 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             @Override
             public void onClick(View v) {
                 Reminder reminder = new Reminder();
-
                 ReminderLab.get(getActivity()).addReminder(reminder);
-
-                Intent intent = ReminderActivity.newIntent(getActivity(), reminder.getUuid());
-                startActivity(intent);
+                updateUI();
+                mCallbacks.onCrimeSelected(reminder);
             }
         });
         reminderRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -113,8 +128,7 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
 
         @Override
         public void onClick(View v) {
-            Intent intent = ReminderActivity.newIntent(getActivity(), mReminder.getUuid());
-            startActivity(intent);
+            mCallbacks.onCrimeSelected(mReminder);
         }
     }
 

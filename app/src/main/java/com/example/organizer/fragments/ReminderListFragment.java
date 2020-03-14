@@ -2,7 +2,6 @@ package com.example.organizer.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,13 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.organizer.R;
-import com.example.organizer.activities.ReminderActivity;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
 import com.example.organizer.helper.ItemTouchHelperAdapter;

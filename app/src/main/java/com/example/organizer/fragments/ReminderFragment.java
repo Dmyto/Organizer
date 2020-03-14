@@ -26,7 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.organizer.R;
-import com.example.organizer.activities.ReminderActivity;
+import com.example.organizer.activities.ReminderPagerActivity;
 import com.example.organizer.data.PictureUtils;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
@@ -73,8 +73,8 @@ public class ReminderFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UUID reminderId = (UUID) getActivity().getIntent()
-                .getSerializableExtra(ReminderActivity.EXTRA_REMINDER_ID);
+
+        UUID reminderId = (UUID) getArguments().getSerializable(ARG_REMINDER_ID);
         mReminder = ReminderLab.get(getActivity()).getReminder(reminderId);
         mPhotoFile = ReminderLab.get(getActivity()).getPhotoFile(mReminder);
     }

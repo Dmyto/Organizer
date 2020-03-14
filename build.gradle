@@ -30,4 +30,6 @@ task clean(type: Delete) {
 ext {
     roomVersion = '1.1.1'
     archLifecycleVersion = '1.0.0'
+    lastestMaterialDrawerRelease = '6.1.2'
+    latestFastAdapterRelease = '3.2.5'
 }

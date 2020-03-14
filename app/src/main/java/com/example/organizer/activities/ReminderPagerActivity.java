@@ -59,9 +59,10 @@ public class ReminderPagerActivity extends AppCompatActivity {
         });
 
         for (int i = 0; i < mReminders.size(); i++) {
-            if (mReminders.get(i).getUuid().equals(reminderId)) ;
-            mViewPager.setCurrentItem(i);
-            break;
+            if (mReminders.get(i).getUuid().equals(reminderId)) {
+                mViewPager.setCurrentItem(i);
+                break;
+            }
         }
     }
 }

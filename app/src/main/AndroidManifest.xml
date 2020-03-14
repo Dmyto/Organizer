@@ -14,8 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ReminderActivity"
-            android:parentActivityName=".activities.ReminderListActivity"></activity>
+
         <activity android:name=".activities.ReminderListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,6 +37,7 @@
             android:name=".activities.ReminderPagerActivity"
             android:parentActivityName=".activities.ReminderListActivity"
             tools:ignore="DuplicateActivity" />
+        <activity android:name=".activities.SingleFragmentActivity" />
     </application>
 
 </manifest>

@@ -57,7 +57,7 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_reminder_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_reminder_list, container, false);
         reminderRecyclerView = view.findViewById(R.id.reminder_recycler_view);
 
         FloatingActionButton fab = view.findViewById(R.id.fab);

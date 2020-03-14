@@ -1,5 +1,6 @@
 package com.example.organizer.fragments;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -16,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +33,7 @@ import com.example.organizer.activities.ReminderPagerActivity;
 import com.example.organizer.data.PictureUtils;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
+import com.github.clans.fab.FloatingActionButton;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -40,20 +44,25 @@ import java.util.UUID;
 public class ReminderFragment extends Fragment {
     private Reminder mReminder;
     private EditText mTitleField, mDetailsField;
+    private TextView mContactInfo;
+
     private Button mDateButton;
     private Button mTimeButton;
-    private Button mReportButton;
-    private Button mContactButton;
-    private Button mCallToContactButton;
-    private Button mTakePhotoButton;
+
+    private ImageButton mCallContactButton;
+
     private ImageView mPhotoImageView;
+
     private File mPhotoFile;
+
+    private FloatingActionButton mShareButton, mAddContactButton, mAddPhotoButton, mAddNotificationButton;
 
     private static final String ARG_REMINDER_ID = "reminder_id";
     private static final String DIALOG_DATE = "DialogDate";
 
     private static final String DIALOG_TIME = "DialogTime";
     private static final String DIALOG_VIEWER = "DialogView";
+    private static final String NOTIFICATION_CHANNEL_ID = "notification_channel";
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
@@ -92,10 +101,15 @@ public class ReminderFragment extends Fragment {
 
         mDateButton = view.findViewById(R.id.reminder_date_button);
         mTimeButton = view.findViewById(R.id.reminder_time_button);
-        mReportButton = view.findViewById(R.id.send_reminder_button);
-        mContactButton = view.findViewById(R.id.add_contact_button);
-        mCallToContactButton = view.findViewById(R.id.call_to_contact_button);
-        mTakePhotoButton = view.findViewById(R.id.reminder_photo_button);
+
+        mAddContactButton = view.findViewById(R.id.add_contact_reminder_button);
+        mAddPhotoButton = view.findViewById(R.id.add_photo_reminder_button);
+        mShareButton = view.findViewById(R.id.share_reminder_button);
+        mAddNotificationButton = view.findViewById(R.id.notification_reminder_button);
+
+        mCallContactButton = view.findViewById(R.id.call_to_contact_button);
+
+        mContactInfo = view.findViewById(R.id.contact_info);
 
         mTitleField = view.findViewById(R.id.reminder_title);
         mDetailsField = view.findViewById(R.id.reminder_notes);
@@ -169,7 +183,7 @@ public class ReminderFragment extends Fragment {
             }
         });
 
-        mReportButton.setOnClickListener(new View.OnClickListener() {
+        mShareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -184,9 +198,7 @@ public class ReminderFragment extends Fragment {
         });
 
 
-        mCallToContactButton.setText(mReminder.getContactNumber());
-
-        mCallToContactButton.setOnClickListener(new View.OnClickListener() {
+        mCallContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mReminder.getContactNumber() == null) {
@@ -202,7 +214,7 @@ public class ReminderFragment extends Fragment {
         final Uri uriCont = Uri.parse("content://contacts");
         final Intent pickContact = new Intent(Intent.ACTION_PICK, uriCont)
                 .setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-        mContactButton.setOnClickListener(new View.OnClickListener() {
+        mAddContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivityForResult(pickContact, REQUEST_CONTACT);
@@ -210,21 +222,19 @@ public class ReminderFragment extends Fragment {
         });
 
         if (mReminder.getContact() != null && mReminder.getContactNumber() != null) {
-            mContactButton.setText(mReminder.getContact());
-            mCallToContactButton.setText(mReminder.getContactNumber());
+            mContactInfo.setText(mReminder.getContact() + "\n" + mReminder.getContactNumber());
+            mContactInfo.setVisibility(View.VISIBLE);
+            mCallContactButton.setVisibility(View.VISIBLE);
         }
 
         PackageManager packageManager = getActivity().getPackageManager();
-        if (packageManager.resolveActivity(pickContact, packageManager.MATCH_DEFAULT_ONLY) == null) {
-            mContactButton.setEnabled(false);
-        }
 
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         boolean canTakePhoto = mPhotoFile != null && captureImage.resolveActivity(packageManager) != null;
-        mTakePhotoButton.setEnabled(canTakePhoto);
+        mAddPhotoButton.setEnabled(canTakePhoto);
 
-        mTakePhotoButton.setOnClickListener(new View.OnClickListener() {
+        mAddPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = FileProvider.getUriForFile(getActivity(), "com.example.orgaziner.data.fileprovider", mPhotoFile);
@@ -273,8 +283,9 @@ public class ReminderFragment extends Fragment {
                 String number = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                 mReminder.setContactNumber(number);
 
-                mContactButton.setText(contact);
-                mCallToContactButton.setText(number);
+                mContactInfo.setText(contact + "\n" + number);
+                mContactInfo.setVisibility(View.VISIBLE);
+                mCallContactButton.setVisibility(View.VISIBLE);
             } finally {
                 c.close();
             }
@@ -317,9 +328,11 @@ public class ReminderFragment extends Fragment {
     private void updatePhoto() {
         if (mPhotoFile == null || !mPhotoFile.exists()) {
             mPhotoImageView.setImageDrawable(null);
+            mPhotoImageView.setVisibility(View.GONE);
         } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoImageView.setImageBitmap(bitmap);
+            mPhotoImageView.setVisibility(View.VISIBLE);
         }
     }
 }

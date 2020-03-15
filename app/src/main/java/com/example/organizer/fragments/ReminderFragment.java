@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -46,8 +48,7 @@ public class ReminderFragment extends Fragment {
     private EditText mTitleField, mDetailsField;
     private TextView mContactInfo;
 
-    private Button mDateButton;
-    private Button mTimeButton;
+    private CheckBox mNotificationChecked;
 
     private ImageButton mCallContactButton;
 
@@ -82,7 +83,6 @@ public class ReminderFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         UUID reminderId = (UUID) getArguments().getSerializable(ARG_REMINDER_ID);
         mReminder = ReminderLab.get(getActivity()).getReminder(reminderId);
         mPhotoFile = ReminderLab.get(getActivity()).getPhotoFile(mReminder);
@@ -99,16 +99,13 @@ public class ReminderFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reminder, container, false);
 
-        mDateButton = view.findViewById(R.id.reminder_date_button);
-        mTimeButton = view.findViewById(R.id.reminder_time_button);
-
         mAddContactButton = view.findViewById(R.id.add_contact_reminder_button);
         mAddPhotoButton = view.findViewById(R.id.add_photo_reminder_button);
         mShareButton = view.findViewById(R.id.share_reminder_button);
         mAddNotificationButton = view.findViewById(R.id.notification_reminder_button);
 
         mCallContactButton = view.findViewById(R.id.call_to_contact_button);
-
+        mNotificationChecked = (CheckBox) view.findViewById(R.id.checkbox_notification);
         mContactInfo = view.findViewById(R.id.contact_info);
 
         mTitleField = view.findViewById(R.id.reminder_title);
@@ -152,24 +149,19 @@ public class ReminderFragment extends Fragment {
             }
         });
 
-        updateDate();
-        mDateButton.setOnClickListener(new View.OnClickListener() {
+        mNotificationChecked.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                FragmentManager fragmentManager = getFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment.newInstance(mReminder.getDate());
-                dialog.setTargetFragment(ReminderFragment.this, REQUEST_DATE);
-                dialog.show(fragmentManager, DIALOG_DATE);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mReminder.setNotification(isChecked);
             }
         });
 
-        mTimeButton.setOnClickListener(new View.OnClickListener() {
+        updateDate();
+
+        mAddNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getFragmentManager();
-                TimePickerFragment dialog = TimePickerFragment.newInstance(mReminder.getDate());
-                dialog.setTargetFragment(ReminderFragment.this, REQUEST_TIME);
-                dialog.show(fragmentManager, DIALOG_TIME);
+                datePicker();
             }
         });
 
@@ -249,8 +241,21 @@ public class ReminderFragment extends Fragment {
         });
 
         updatePhoto();
-
         return view;
+    }
+
+    private void datePicker() {
+        FragmentManager fragmentManager = getFragmentManager();
+        DatePickerFragment dialog = DatePickerFragment.newInstance(mReminder.getDate());
+        dialog.setTargetFragment(ReminderFragment.this, REQUEST_DATE);
+        dialog.show(fragmentManager, DIALOG_DATE);
+    }
+
+    private void timePicker() {
+        FragmentManager fragmentManager = getFragmentManager();
+        TimePickerFragment dialog = TimePickerFragment.newInstance(mReminder.getDate());
+        dialog.setTargetFragment(ReminderFragment.this, REQUEST_TIME);
+        dialog.show(fragmentManager, DIALOG_TIME);
     }
 
     @Override
@@ -259,9 +264,11 @@ public class ReminderFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mReminder.setDate(date);
             updateDate();
+            timePicker();
         } else if (requestCode == REQUEST_TIME && data != null) {
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             mReminder.setDate(date);
+            mNotificationChecked.setChecked(true);
             updateDate();
         } else if (requestCode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData();
@@ -304,7 +311,6 @@ public class ReminderFragment extends Fragment {
 
     private String getReminderreport() {
         String details = mReminder.getDetails() + " ";
-
         String contact = mReminder.getContact();
         String number = mReminder.getContactNumber();
         if (contact == null) {
@@ -315,14 +321,16 @@ public class ReminderFragment extends Fragment {
         }
 
         String report = getString(R.string.send_report) + " \n" + mReminder.getTitle() + "\n" + contact + number + "\n" + details;
-
         return report;
     }
 
 
     private void updateDate() {
-        mDateButton.setText(DateFormat.getDateInstance().format(mReminder.getDate()));
-        mTimeButton.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(mReminder.getDate()));
+        mNotificationChecked.setText(DateFormat.getDateInstance().format(mReminder.getDate()) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(mReminder.getDate()));
+        if (mReminder.getNotification()){
+            mNotificationChecked.setVisibility(View.VISIBLE);
+            mNotificationChecked.setChecked(true);
+        }
     }
 
     private void updatePhoto() {

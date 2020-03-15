@@ -11,6 +11,7 @@ public class Reminder {
     private Date mDate;
     private String contact;
     private String contactNumber;
+    private boolean notification;
 
 
     public Reminder() {
@@ -74,5 +75,11 @@ public class Reminder {
         return "IMG_" + getUuid().toString() + ".jpg";
     }
 
+    public Boolean getNotification() {
+        return notification;
+    }
 
+    public void setNotification(boolean notification) {
+        this.notification = notification;
+    }
 }

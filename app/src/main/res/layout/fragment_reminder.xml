@@ -40,25 +40,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/reminder_date_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/reminder_time_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
                 <ImageView
                     android:id="@+id/reminder_photo"
                     android:layout_width="100dp"
@@ -67,23 +48,51 @@
                     android:cropToPadding="true"
                     android:visibility="gone" />
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/contact_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:layout_weight="1"
+                        android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/call_to_contact_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|center_horizontal"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_call_call_24dp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/checkbox_notification"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
+
                 <TextView
-                    android:id="@+id/contact_info"
+                    android:id="@+id/reminder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_weight="1"
+                    android:text="Reminder"
                     android:visibility="gone" />
-
-                <ImageButton
-                    android:id="@+id/call_to_contact_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_call_call_24dp"
-                    android:visibility="gone" />
-
             </LinearLayout>
 
             <EditText
@@ -141,25 +150,25 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="8dp"
-                fab:fab_label="Add photo"
                 android:layout_marginBottom="8dp"
                 android:src="@drawable/ic_add_a_photo_white_24dp"
                 fab:fab_colorNormal="@color/colorPrimary"
                 fab:fab_colorPressed="@color/colorPressed"
-                fab:fab_colorRipple="@color/colorPrimaryDark" />
+                fab:fab_colorRipple="@color/colorPrimaryDark"
+                fab:fab_label="Add photo" />
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/add_contact_reminder_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                fab:fab_label="Add contact"
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
                 android:src="@drawable/ic_person_add_white_24dp"
                 fab:fab_colorNormal="@color/colorPrimary"
                 fab:fab_colorPressed="@color/colorPressed"
-                fab:fab_colorRipple="@color/colorPrimaryDark" />
+                fab:fab_colorRipple="@color/colorPrimaryDark"
+                fab:fab_label="Add contact" />
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/share_reminder_button"
@@ -168,12 +177,12 @@
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                fab:fab_label="Add share"
-
                 android:src="@drawable/ic_share_white_24dp"
+
                 fab:fab_colorNormal="@color/colorPrimary"
                 fab:fab_colorPressed="@color/colorPressed"
-                fab:fab_colorRipple="@color/colorPrimaryDark" />
+                fab:fab_colorRipple="@color/colorPrimaryDark"
+                fab:fab_label="Add share" />
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/notification_reminder_button"
@@ -182,12 +191,11 @@
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                fab:fab_label="Notification disabled"
-
                 android:src="@drawable/ic_notifications_none_white_24dp"
                 fab:fab_colorNormal="@color/colorPrimary"
                 fab:fab_colorPressed="@color/colorPressed"
-                fab:fab_colorRipple="@color/colorPrimaryDark" />
+                fab:fab_colorRipple="@color/colorPrimaryDark"
+                fab:fab_label="Notification disabled" />
         </com.github.clans.fab.FloatingActionMenu>
 
     </RelativeLayout>

@@ -100,6 +100,7 @@ public class ReminderLab {
         values.put(ReminderDBSchema.ReminderTable.Cols.DETAILS, reminder.getDetails());
         values.put(ReminderDBSchema.ReminderTable.Cols.CONTACT, reminder.getContact());
         values.put(ReminderDBSchema.ReminderTable.Cols.CONTACT_NUMBER, reminder.getContactNumber());
+        values.put(ReminderDBSchema.ReminderTable.Cols.NOTIFICATION, reminder.getNotification() ? 1 : 0);
         return values;
     }
 

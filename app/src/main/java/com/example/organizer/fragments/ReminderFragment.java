@@ -1,12 +1,16 @@
 package com.example.organizer.fragments;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -25,11 +29,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.organizer.App;
 import com.example.organizer.R;
 import com.example.organizer.activities.ReminderPagerActivity;
 import com.example.organizer.data.PictureUtils;
@@ -39,9 +46,12 @@ import com.github.clans.fab.FloatingActionButton;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class ReminderFragment extends Fragment {
     private Reminder mReminder;
@@ -56,11 +66,14 @@ public class ReminderFragment extends Fragment {
 
     private File mPhotoFile;
 
+
+
     private FloatingActionButton mShareButton, mAddContactButton, mAddPhotoButton, mAddNotificationButton;
+
+    private NotificationManagerCompat mNotificationManagerCompat;
 
     private static final String ARG_REMINDER_ID = "reminder_id";
     private static final String DIALOG_DATE = "DialogDate";
-
     private static final String DIALOG_TIME = "DialogTime";
     private static final String DIALOG_VIEWER = "DialogView";
     private static final String NOTIFICATION_CHANNEL_ID = "notification_channel";
@@ -86,6 +99,7 @@ public class ReminderFragment extends Fragment {
         UUID reminderId = (UUID) getArguments().getSerializable(ARG_REMINDER_ID);
         mReminder = ReminderLab.get(getActivity()).getReminder(reminderId);
         mPhotoFile = ReminderLab.get(getActivity()).getPhotoFile(mReminder);
+        mNotificationManagerCompat = NotificationManagerCompat.from(getContext());
     }
 
     @Override
@@ -107,6 +121,8 @@ public class ReminderFragment extends Fragment {
         mCallContactButton = view.findViewById(R.id.call_to_contact_button);
         mNotificationChecked = (CheckBox) view.findViewById(R.id.checkbox_notification);
         mContactInfo = view.findViewById(R.id.contact_info);
+
+
 
         mTitleField = view.findViewById(R.id.reminder_title);
         mDetailsField = view.findViewById(R.id.reminder_notes);
@@ -277,9 +293,7 @@ public class ReminderFragment extends Fragment {
                     ContactsContract.CommonDataKinds.Phone.NUMBER
             };
 
-            Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null);
-
-            try {
+            try (Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null)) {
                 if (c.getCount() == 0) {
                     return;
                 }
@@ -293,8 +307,6 @@ public class ReminderFragment extends Fragment {
                 mContactInfo.setText(contact + "\n" + number);
                 mContactInfo.setVisibility(View.VISIBLE);
                 mCallContactButton.setVisibility(View.VISIBLE);
-            } finally {
-                c.close();
             }
         } else if (requestCode == REQUEST_PHOTO && data != null) {
             Uri uri = FileProvider.getUriForFile(getActivity(), "com.example.orgaziner.data.fileprovider", mPhotoFile);
@@ -327,9 +339,11 @@ public class ReminderFragment extends Fragment {
 
     private void updateDate() {
         mNotificationChecked.setText(DateFormat.getDateInstance().format(mReminder.getDate()) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(mReminder.getDate()));
-        if (mReminder.getNotification()){
+        if (mReminder.getNotification()) {
             mNotificationChecked.setVisibility(View.VISIBLE);
             mNotificationChecked.setChecked(true);
+
+
         }
     }
 
@@ -342,5 +356,18 @@ public class ReminderFragment extends Fragment {
             mPhotoImageView.setImageBitmap(bitmap);
             mPhotoImageView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void sendOnChannel() {
+        Long mills = mReminder.getDate().getTime();
+        Notification notification = new NotificationCompat.Builder(getContext(), App.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notifications)
+                .setContentTitle(mReminder.getTitle())
+                .setContentText(mReminder.getDetails())
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setWhen(mills)
+                .build();
+        mNotificationManagerCompat.notify(1, notification);
     }
 }

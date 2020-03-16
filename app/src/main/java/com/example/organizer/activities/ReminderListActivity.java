@@ -1,17 +1,22 @@
 package com.example.organizer.activities;
 
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.os.Bundle;
 
 
 import com.example.organizer.R;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.fragments.ReminderFragment;
 import com.example.organizer.fragments.ReminderListFragment;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 public class ReminderListActivity extends SingleFragmentActivity implements ReminderListFragment.Callbacks {
+
+    private BottomNavigationViewEx bottomBar;
 
     @Override
     protected Fragment createFragment() {
@@ -35,5 +40,17 @@ public class ReminderListActivity extends SingleFragmentActivity implements Remi
                     .commit();
         }
     }
-}
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        bottomBar = findViewById(R.id.bottom_bar);
+        initBottomBar();
+    }
+
+    private void initBottomBar() {
+        bottomBar.enableItemShiftingMode(false);
+        bottomBar.enableAnimation(false);
+    }
+}

@@ -24,6 +24,8 @@ public class ReminderCursorWrapper extends CursorWrapper {
         String contact = getString(getColumnIndex(ReminderDBSchema.ReminderTable.Cols.CONTACT));
         String contactNumber = getString(getColumnIndex(ReminderDBSchema.ReminderTable.Cols.CONTACT_NUMBER));
         int notification = getInt(getColumnIndex(ReminderDBSchema.ReminderTable.Cols.NOTIFICATION));
+        Double latitude = getDouble(getColumnIndex(ReminderDBSchema.ReminderTable.Cols.LATITUDE));
+        Double longitude = getDouble(getColumnIndex(ReminderDBSchema.ReminderTable.Cols.LONGITUDE));
 
 
         Reminder reminder = new Reminder(UUID.fromString(uuidString));
@@ -32,8 +34,9 @@ public class ReminderCursorWrapper extends CursorWrapper {
         reminder.setDate(new Date(date));
         reminder.setContact(contact);
         reminder.setContactNumber(contactNumber);
-        reminder.setNotification(notification !=0);
-
+        reminder.setNotification(notification != 0);
+        reminder.setLatitude(latitude);
+        reminder.setLongitude(longitude);
         return reminder;
     }
 }

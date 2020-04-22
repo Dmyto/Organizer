@@ -17,7 +17,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
     @LayoutRes
     protected int getLayoutResId() {
-        return R.layout.activity_fragment;
+        return R.layout.activity_main_organizer;
     }
 
     @Override
@@ -26,12 +26,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         setContentView(getLayoutResId());
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
+        Fragment fragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
 
         if (fragment == null) {
             fragment = createFragment();
             fragmentManager.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
+                    .add(R.id.nav_host_fragment, fragment)
                     .commit();
         }
     }

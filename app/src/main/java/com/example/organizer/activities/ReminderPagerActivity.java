@@ -14,7 +14,7 @@ import android.os.Bundle;
 import com.example.organizer.R;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
-import com.example.organizer.fragments.ReminderFragment;
+import com.example.organizer.fragments.reminderfragment.ReminderFragment;
 
 import java.util.List;
 import java.util.UUID;

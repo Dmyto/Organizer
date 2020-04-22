@@ -37,6 +37,25 @@
     <string name="moments_title">Search</string>
     <string name="notifications_title">Notification</string>
     <string name="messages_title">List</string>
+    <string name="title_activity_main_organizer">MainOrganizerActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_list">List</string>
+    <string name="create_reminder">Create reminder</string>
+    <string name="title_map">Maps</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="normal_map">Normal</string>
+    <string name="hybrid_map">Hybrid</string>
+    <string name="satellite_map">Satellite</string>
+    <string name="terrain_map">Terrain</string>
+    <string name="dropped_pin">Dropped Pin</string>
+    <string name="lat_long_snippet">Lat: %1$.5f, Long: %2$.5f</string>
+    <string name="poi">poi</string>
+    <string name="description_title_label">Description</string>
+    <string name="position_label">%x %d</string>
+    <string name="update_date_label">%s</string>
+
 
 
 </resources>

@@ -12,6 +12,8 @@ public class ReminderDBSchema {
             public static final String CONTACT = "contact";
             public static final String CONTACT_NUMBER = "contact_number";
             public static final String NOTIFICATION = "notification";
+            public static final String LATITUDE = "latitude";
+            public static final String LONGITUDE = "longitude";
         }
     }
 }

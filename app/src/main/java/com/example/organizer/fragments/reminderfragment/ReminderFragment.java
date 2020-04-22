@@ -1,9 +1,9 @@
-package com.example.organizer.fragments;
+package com.example.organizer.fragments.reminderfragment;
 
+import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -19,13 +19,13 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,9 +36,9 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.organizer.AlarmManagerBroadcastReceiver;
 import com.example.organizer.App;
 import com.example.organizer.R;
-import com.example.organizer.activities.ReminderPagerActivity;
 import com.example.organizer.data.PictureUtils;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
@@ -46,31 +46,29 @@ import com.github.clans.fab.FloatingActionButton;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static android.content.Context.NOTIFICATION_SERVICE;
-
 public class ReminderFragment extends Fragment {
     private Reminder mReminder;
-    private EditText mTitleField, mDetailsField;
+    private EditText mTitleField, mDetailsField, mPositionEditText;
     private TextView mContactInfo;
 
     private CheckBox mNotificationChecked;
 
     private ImageButton mCallContactButton;
 
-    private ImageView mPhotoImageView;
+    private ImageView mPhotoImageView, mMarkerImageView;
 
     private File mPhotoFile;
-
-
 
     private FloatingActionButton mShareButton, mAddContactButton, mAddPhotoButton, mAddNotificationButton;
 
     private NotificationManagerCompat mNotificationManagerCompat;
+
+    private AlarmManager mAlarmManager;
+    private PendingIntent mPendingIntent;
 
     private static final String ARG_REMINDER_ID = "reminder_id";
     private static final String DIALOG_DATE = "DialogDate";
@@ -123,14 +121,23 @@ public class ReminderFragment extends Fragment {
         mContactInfo = view.findViewById(R.id.contact_info);
 
 
-
         mTitleField = view.findViewById(R.id.reminder_title);
         mDetailsField = view.findViewById(R.id.reminder_notes);
+        mPositionEditText = view.findViewById(R.id.position_coordinates);
 
         mPhotoImageView = view.findViewById(R.id.reminder_photo);
+        mMarkerImageView = view.findViewById(R.id.position_marker);
 
         mTitleField.setText(mReminder.getTitle());
         mDetailsField.setText(mReminder.getDetails());
+
+        mAlarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+        Intent alarmIntent = new Intent(getActivity(), AlarmManagerBroadcastReceiver.class);
+
+
+        mPendingIntent = PendingIntent.getBroadcast(getContext(), 0, alarmIntent, 0);
+
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -210,9 +217,9 @@ public class ReminderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mReminder.getContactNumber() == null) {
-                    return;
                 } else {
-                    Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", mReminder.getContactNumber(), null));
+                    Intent callIntent = new Intent(Intent.ACTION_DIAL,
+                            Uri.fromParts("tel", mReminder.getContactNumber(), null));
                     startActivity(callIntent);
                 }
 
@@ -257,7 +264,30 @@ public class ReminderFragment extends Fragment {
         });
 
         updatePhoto();
+
+        if (mReminder.getLongitude() != null && mReminder.getLatitude() != null) {
+//            mPositionEditText.setText(getString(R.string.position_label, mReminder.getLatitude(), mReminder.getLongitude()));
+            mPositionEditText.setText(mReminder.getLatitude() + " " + mReminder.getLongitude());
+            mPositionEditText.setVisibility(View.VISIBLE);
+            mMarkerImageView.setVisibility(View.VISIBLE);
+
+        }
+
+        mMarkerImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mapDialog();
+            }
+        });
+
         return view;
+    }
+
+    private void mapDialog() {
+        FragmentManager fragmentManager = getFragmentManager();
+        DetailsViewerFragment dialog = DetailsViewerFragment.newInstance(mReminder.getLongitude(), mReminder.getLatitude());
+        dialog.setTargetFragment(ReminderFragment.this, REQUEST_DATE);
+        dialog.show(fragmentManager, DIALOG_DATE);
     }
 
     private void datePicker() {
@@ -356,18 +386,5 @@ public class ReminderFragment extends Fragment {
             mPhotoImageView.setImageBitmap(bitmap);
             mPhotoImageView.setVisibility(View.VISIBLE);
         }
-    }
-
-    public void sendOnChannel() {
-        Long mills = mReminder.getDate().getTime();
-        Notification notification = new NotificationCompat.Builder(getContext(), App.CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications)
-                .setContentTitle(mReminder.getTitle())
-                .setContentText(mReminder.getDetails())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setWhen(mills)
-                .build();
-        mNotificationManagerCompat.notify(1, notification);
     }
 }

@@ -12,7 +12,8 @@ public class Reminder {
     private String contact;
     private String contactNumber;
     private boolean notification;
-
+    private Double latitude;
+    private Double longitude;
 
     public Reminder() {
         this(UUID.randomUUID());
@@ -81,5 +82,23 @@ public class Reminder {
 
     public void setNotification(boolean notification) {
         this.notification = notification;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 }

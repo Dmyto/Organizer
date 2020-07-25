@@ -1,7 +1,6 @@
-package com.example.organizer.fragments.reminderfragment;
+package com.example.organizer.ui.reminderfragment;
 
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -25,11 +23,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
@@ -37,7 +33,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.organizer.AlarmManagerBroadcastReceiver;
-import com.example.organizer.App;
 import com.example.organizer.R;
 import com.example.organizer.data.PictureUtils;
 import com.example.organizer.data.Reminder;

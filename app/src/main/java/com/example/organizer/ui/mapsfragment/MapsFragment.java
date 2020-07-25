@@ -1,4 +1,4 @@
-package com.example.organizer.fragments.mapsfragment;
+package com.example.organizer.ui.mapsfragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +24,7 @@ import com.example.organizer.R;
 import com.example.organizer.activities.MainOrganizerActivity;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
-import com.example.organizer.fragments.reminderlistfragment.ReminderListFragment;
+import com.example.organizer.ui.reminderlistfragment.ReminderListFragment;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

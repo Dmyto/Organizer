@@ -55,7 +55,7 @@
     <string name="description_title_label">Description</string>
     <string name="position_label">%x %d</string>
     <string name="update_date_label">%s</string>
-
+    <string name="image">image</string>
 
 
 </resources>

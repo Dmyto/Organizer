@@ -1,4 +1,4 @@
-package com.example.organizer.fragments.reminderfragment;
+package com.example.organizer.ui.reminderfragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;

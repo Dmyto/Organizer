@@ -9,7 +9,7 @@
     You can also add your credentials to an existing key, using these values:
 
     Package name:
-    com.example.organizer.fragments.reminderlistfragment
+    com.example.organizer.ui.reminderlistfragment
 
     SHA-1 certificate fingerprint:
     2E:2C:70:33:92:A5:64:DC:31:9D:6C:DF:7B:DF:80:D8:57:5F:13:4B

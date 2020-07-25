@@ -1,4 +1,4 @@
-package com.example.organizer.fragments.reminderfragment;
+package com.example.organizer.ui.reminderfragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -81,7 +81,7 @@ public class DetailsViewerFragment extends DialogFragment implements OnMapReadyC
         super.onDestroyView();
         assert getFragmentManager() != null;
         Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
-        FragmentTransaction fragmentTransaction = Objects.requireNonNull(getActivity().getSupportFragmentManager().beginTransaction());
+        FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.remove(fragment);
         fragmentTransaction.commit();
 

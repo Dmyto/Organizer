@@ -1,4 +1,4 @@
-package com.example.organizer.fragments.reminderlistfragment;
+package com.example.organizer.ui.reminderlistfragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -25,7 +25,6 @@ import com.example.organizer.data.ReminderLab;
 import com.example.organizer.helper.ItemTouchHelperAdapter;
 import com.example.organizer.helper.OnStartDragListener;
 import com.example.organizer.helper.SimpleItemTouchHelperCallback;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DateFormat;
 import java.util.Collections;
@@ -80,7 +79,6 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
         reminderRecyclerView = view.findViewById(R.id.reminder_recycler_view);
         mProgressBar = view.findViewById(R.id.progress_bar);
         setHasOptionsMenu(true);
-
         reminderRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         updateUI();
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) reminderAdapter);
@@ -112,33 +110,6 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
-    }
-
-    private class ReminderHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private TextView mTitleTextView;
-        private TextView mDateTextView;
-        private Reminder mReminder;
-
-
-        public ReminderHolder(LayoutInflater layoutInflater, ViewGroup parent) {
-            super(layoutInflater.inflate(R.layout.list_item_reminder, parent, false));
-            mTitleTextView = itemView.findViewById(R.id.reminder_title_list);
-            mDateTextView = itemView.findViewById(R.id.reminder_date);
-            itemView.setOnClickListener(this);
-        }
-
-        @SuppressLint("SetTextI18n")
-        public void bind(Reminder reminder) {
-            mReminder = reminder;
-            mTitleTextView.setText(mReminder.getTitle());
-            mDateTextView.setText(DateFormat.getDateInstance().format(mReminder.getDate()) + " " + DateFormat.getTimeInstance().format(mReminder.getDate()));
-        }
-
-        @Override
-        public void onClick(View v) {
-            mCallbacks.onCrimeSelected(mReminder);
-        }
     }
 
     private class ReminderAdapter extends RecyclerView.Adapter<ReminderHolder> implements ItemTouchHelperAdapter {
@@ -189,6 +160,35 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             return true;
         }
     }
+
+
+    private class ReminderHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private TextView mTitleTextView;
+        private TextView mDateTextView;
+        private Reminder mReminder;
+
+
+        public ReminderHolder(LayoutInflater layoutInflater, ViewGroup parent) {
+            super(layoutInflater.inflate(R.layout.list_item_reminder, parent, false));
+            mTitleTextView = itemView.findViewById(R.id.reminder_title_list);
+            mDateTextView = itemView.findViewById(R.id.reminder_date);
+            itemView.setOnClickListener(this);
+        }
+
+        @SuppressLint("SetTextI18n")
+        public void bind(Reminder reminder) {
+            mReminder = reminder;
+            mTitleTextView.setText(mReminder.getTitle());
+            mDateTextView.setText(DateFormat.getDateInstance().format(mReminder.getDate()) + " " + DateFormat.getTimeInstance().format(mReminder.getDate()));
+        }
+
+        @Override
+        public void onClick(View v) {
+            mCallbacks.onCrimeSelected(mReminder);
+        }
+    }
+
 
 
 }

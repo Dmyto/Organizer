@@ -5,8 +5,8 @@ import android.os.Bundle;
 
 import com.example.organizer.R;
 import com.example.organizer.data.Reminder;
-import com.example.organizer.fragments.reminderfragment.ReminderFragment;
-import com.example.organizer.fragments.reminderlistfragment.ReminderListFragment;
+import com.example.organizer.ui.reminderfragment.ReminderFragment;
+import com.example.organizer.ui.reminderlistfragment.ReminderListFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.fragment.app.Fragment;
@@ -16,8 +16,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 public class MainOrganizerActivity extends SingleFragmentActivity implements ReminderListFragment.Callbacks {
-
-
+    
     @Override
     protected Fragment createFragment() {
         return null;
@@ -49,7 +48,7 @@ public class MainOrganizerActivity extends SingleFragmentActivity implements Rem
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_map, R.id.navigation_list)
+                R.id.news_list, R.id.navigation_map, R.id.navigation_list)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);

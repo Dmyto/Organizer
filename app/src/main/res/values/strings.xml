@@ -56,6 +56,7 @@
     <string name="position_label">%x %d</string>
     <string name="update_date_label">%s</string>
     <string name="image">image</string>
+    <string name="close_string">Close</string>
 
 
 </resources>

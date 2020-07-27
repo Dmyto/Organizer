@@ -42,7 +42,6 @@ public class PhotoViewerFragment extends DialogFragment {
         mImageView.setImageBitmap(bitmap);
         return new AlertDialog.Builder(getActivity())
                 .setView(view)
-                .setTitle("Photo")
                 .create();
     }
 }

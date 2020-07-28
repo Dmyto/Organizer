@@ -59,8 +59,9 @@
         <activity
             android:name=".activities.MainOrganizerActivity"
             android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar"
             android:label="@string/title_activity_main_organizer">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -25,6 +25,8 @@ import com.example.organizer.data.ReminderLab;
 import com.example.organizer.helper.ItemTouchHelperAdapter;
 import com.example.organizer.helper.OnStartDragListener;
 import com.example.organizer.helper.SimpleItemTouchHelperCallback;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.DateFormat;
 import java.util.Collections;
@@ -76,9 +78,20 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reminder_list, container, false);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Reminder reminder = new Reminder();
+                ReminderLab.get(getActivity()).addReminder(reminder);
+                updateUI();
+                mCallbacks.onCrimeSelected(reminder);
+            }
+        });
+
         reminderRecyclerView = view.findViewById(R.id.reminder_recycler_view);
         mProgressBar = view.findViewById(R.id.progress_bar);
-        setHasOptionsMenu(true);
         reminderRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         updateUI();
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) reminderAdapter);
@@ -188,7 +201,4 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             mCallbacks.onCrimeSelected(mReminder);
         }
     }
-
-
-
 }

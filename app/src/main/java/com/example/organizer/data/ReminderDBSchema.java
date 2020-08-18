@@ -14,6 +14,7 @@ public class ReminderDBSchema {
             public static final String NOTIFICATION = "notification";
             public static final String LATITUDE = "latitude";
             public static final String LONGITUDE = "longitude";
+            public static final String QR_CODE = "qrCode";
         }
     }
 }

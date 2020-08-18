@@ -9,7 +9,7 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -56,12 +56,16 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" />
+
         <activity
             android:name=".activities.MainOrganizerActivity"
+            android:label="@string/title_activity_main_organizer"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/title_activity_main_organizer">
-        <intent-filter>
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -83,6 +87,7 @@
             android:parentActivityName=".activities.MainOrganizerActivity"
             tools:ignore="DuplicateActivity" />
         <activity android:name=".activities.SingleFragmentActivity" />
+
     </application>
 
 </manifest>

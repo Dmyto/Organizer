@@ -57,6 +57,9 @@
     <string name="update_date_label">%s</string>
     <string name="image">image</string>
     <string name="close_string">Close</string>
+    <string name="menu_rss">Network(RSS)</string>
+    <string name="menu_map">Map</string>
+    <string name="menu_room">Room</string>
 
 
 </resources>

@@ -189,7 +189,6 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             itemView.setOnClickListener(this);
         }
 
-        @SuppressLint("SetTextI18n")
         public void bind(Reminder reminder) {
             mReminder = reminder;
             mTitleTextView.setText(mReminder.getTitle());

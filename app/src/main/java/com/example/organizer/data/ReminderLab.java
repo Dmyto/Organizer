@@ -103,6 +103,7 @@ public class ReminderLab {
         values.put(ReminderDBSchema.ReminderTable.Cols.NOTIFICATION, reminder.getNotification() ? 1 : 0);
         values.put(ReminderDBSchema.ReminderTable.Cols.LATITUDE, reminder.getLatitude());
         values.put(ReminderDBSchema.ReminderTable.Cols.LONGITUDE, reminder.getLongitude());
+        values.put(ReminderDBSchema.ReminderTable.Cols.QR_CODE, reminder.getQrCode());
 
         return values;
     }

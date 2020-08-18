@@ -27,7 +27,8 @@ public class ReminderBaseHeelper extends SQLiteOpenHelper {
                 ReminderTable.Cols.CONTACT_NUMBER + ", " +
                 ReminderTable.Cols.NOTIFICATION + ", " +
                 ReminderTable.Cols.LONGITUDE + ", " +
-                ReminderTable.Cols.LATITUDE  +
+                ReminderTable.Cols.LATITUDE + ", " +
+                ReminderTable.Cols.QR_CODE +
                 ")"
         );
     }

@@ -19,9 +19,6 @@ import java.io.File;
 
 public class PhotoViewerFragment extends DialogFragment {
     private static final String ARG_PHOTO = "photo";
-    public static final String EXTRA_PHOTO = "photo";
-
-    private ImageView mImageView;
 
     public static PhotoViewerFragment newInstance(File file) {
         Bundle args = new Bundle();
@@ -37,7 +34,7 @@ public class PhotoViewerFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         File file = (File) getArguments().getSerializable(ARG_PHOTO);
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_photo, null);
-        mImageView = view.findViewById(R.id.dialog_photo);
+        ImageView mImageView = view.findViewById(R.id.dialog_photo);
         Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), getActivity());
         mImageView.setImageBitmap(bitmap);
         return new AlertDialog.Builder(getActivity())

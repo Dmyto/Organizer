@@ -22,5 +22,4 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             Toast.makeText(context.getApplicationContext(), "Alarm Manager just ran", Toast.LENGTH_LONG).show();
         }
     }
-
 }

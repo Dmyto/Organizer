@@ -1,4 +1,4 @@
-package com.example.organizer.ui.home;
+package com.example.organizer.ui.rss;
 
 import android.app.Application;
 

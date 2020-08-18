@@ -8,7 +8,7 @@ import android.os.Build;
 
 public class App extends Application {
 
-    public static final String CHANNEL_ID = "rmeinderChannel";
+    public static final String CHANNEL_ID = "reminderChannel";
 
     @Override
     public void onCreate() {

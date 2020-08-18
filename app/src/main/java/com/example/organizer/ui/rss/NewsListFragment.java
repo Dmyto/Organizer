@@ -1,4 +1,4 @@
-package com.example.organizer.ui.home;
+package com.example.organizer.ui.rss;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,15 +10,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.organizer.R;
 import com.example.organizer.network.models.Post;
-import com.example.organizer.ui.reminderfragment.DatePickerFragment;
-import com.example.organizer.ui.reminderfragment.ReminderFragment;
 import com.example.organizer.ui.webfragment.WebFragment;
 
 public class NewsListFragment extends Fragment {

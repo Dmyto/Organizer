@@ -14,6 +14,7 @@ public class Reminder {
     private boolean notification;
     private Double latitude;
     private Double longitude;
+    private String qrCode;
 
     public Reminder() {
         this(UUID.randomUUID());
@@ -96,7 +97,13 @@ public class Reminder {
         this.latitude = latitude;
     }
 
+    public String getQrCode() {
+        return qrCode;
+    }
 
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;

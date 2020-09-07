@@ -1,11 +1,5 @@
 package com.example.organizer.ui.reminderfragment;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -21,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -28,23 +24,22 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.organizer.AlarmManagerBroadcastReceiver;
 import com.example.organizer.R;
 import com.example.organizer.data.PictureUtils;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -52,21 +47,17 @@ import java.util.UUID;
 public class ReminderFragment extends Fragment {
     private Reminder mReminder;
     private EditText mTitleField, mDetailsField;
-    private TextView mContactInfo, mPositionEditText, mQrCodeTextView;
-
+    private TextView mContactInfo, mPositionEditText, mDateTextView;
 
     private ImageButton mCallContactButton;
 
-    private ImageView mPhotoImageView, mMarkerImageView;
+    private ImageView mPhotoImageView, mMarkerImageView, mCalendarIcon;
 
     private File mPhotoFile;
 
-    private FloatingActionButton mShareButton, mAddContactButton, mAddPhotoButton, mQrCodeScanButton;
+    private FloatingActionButton mShareButton, mAddContactButton, mAddPhotoButton, mNotificationButton;
 
     private NotificationManagerCompat mNotificationManagerCompat;
-
-    private AlarmManager mAlarmManager;
-    private PendingIntent mPendingIntent;
 
     private static final String ARG_REMINDER_ID = "reminder_id";
     private static final String DIALOG_DATE = "DialogDate";
@@ -77,6 +68,7 @@ public class ReminderFragment extends Fragment {
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
     private static final int REQUEST_PHOTO = 3;
+    private static final int REQUEST_CALENDAR = 4;
 
     public static ReminderFragment newInstance(UUID uuid) {
         Bundle args = new Bundle();
@@ -110,11 +102,14 @@ public class ReminderFragment extends Fragment {
         mAddContactButton = view.findViewById(R.id.add_contact_reminder_button);
         mAddPhotoButton = view.findViewById(R.id.add_photo_reminder_button);
         mShareButton = view.findViewById(R.id.share_reminder_button);
-        mQrCodeScanButton = view.findViewById(R.id.qr_scan_reminder_button);
+        mNotificationButton = view.findViewById(R.id.notification_reminder_button);
+
+        mDateTextView = view.findViewById(R.id.reminder_date_text);
 
         mCallContactButton = view.findViewById(R.id.call_to_contact_button);
         mContactInfo = view.findViewById(R.id.contact_info);
 
+        mCalendarIcon = view.findViewById(R.id.ic_calendar);
 
         mTitleField = view.findViewById(R.id.reminder_title);
         mDetailsField = view.findViewById(R.id.reminder_notes);
@@ -123,17 +118,8 @@ public class ReminderFragment extends Fragment {
         mPhotoImageView = view.findViewById(R.id.reminder_photo);
         mMarkerImageView = view.findViewById(R.id.position_marker);
 
-        mQrCodeTextView = view.findViewById(R.id.reminder_qr_code_info);
-
         mTitleField.setText(mReminder.getTitle());
         mDetailsField.setText(mReminder.getDetails());
-
-        mAlarmManager = (AlarmManager) requireActivity().getSystemService(Context.ALARM_SERVICE);
-
-        Intent alarmIntent = new Intent(getActivity(), AlarmManagerBroadcastReceiver.class);
-
-
-        mPendingIntent = PendingIntent.getBroadcast(getContext(), 0, alarmIntent, 0);
 
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -169,7 +155,7 @@ public class ReminderFragment extends Fragment {
             }
         });
 
-//        updateDate();
+        updateDate();
 
         mPhotoImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,8 +185,7 @@ public class ReminderFragment extends Fragment {
         mCallContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mReminder.getContactNumber() == null) {
-                } else {
+                if (mReminder.getContactNumber() != null) {
                     Intent callIntent = new Intent(Intent.ACTION_DIAL,
                             Uri.fromParts("tel", mReminder.getContactNumber(), null));
                     startActivity(callIntent);
@@ -246,10 +231,10 @@ public class ReminderFragment extends Fragment {
             }
         });
 
-        mQrCodeScanButton.setOnClickListener(new View.OnClickListener() {
+        mNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                qrCodeScan();
+                datePicker();
             }
         });
 
@@ -270,6 +255,18 @@ public class ReminderFragment extends Fragment {
             }
         });
 
+
+        if (mReminder.getNotification()) {
+            mCalendarIcon.setImageResource(R.drawable.ic_baseline_calendar_today_24_color);
+        }
+
+        mCalendarIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                calendarReminder() ;
+            }
+        });
+
         return view;
     }
 
@@ -284,7 +281,7 @@ public class ReminderFragment extends Fragment {
     }
 
     private void mapDialog() {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getChildFragmentManager();
         DetailsViewerFragment dialog = DetailsViewerFragment.newInstance(mReminder.getLongitude(), mReminder.getLatitude());
         dialog.setTargetFragment(ReminderFragment.this, REQUEST_DATE);
         dialog.show(fragmentManager, DIALOG_DATE);
@@ -304,18 +301,33 @@ public class ReminderFragment extends Fragment {
         dialog.show(fragmentManager, DIALOG_TIME);
     }
 
+    private void calendarReminder() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(mReminder.getDate());
+        Intent intent = new Intent(Intent.ACTION_EDIT);
+        intent.setType("vnd.android.cursor.item/event");
+        intent.putExtra("beginTime", cal.getTimeInMillis());
+        intent.putExtra("allDay", false);
+        intent.putExtra("rrule", "FREQ=DAILY");
+        intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
+        intent.putExtra("title", "A Test Event from android app");
+        startActivity(intent);
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         Log.d("RESULT", requestCode + resultCode + "");
         if (requestCode == REQUEST_DATE && data != null) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mReminder.setDate(date);
-//            updateDate();
+            updateDate();
             timePicker();
         } else if (requestCode == REQUEST_TIME && data != null) {
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             mReminder.setDate(date);
-//            updateDate();
+            updateDate();
+            calendarReminder();
         } else if (requestCode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData();
             String[] queryFields = new String[]{
@@ -366,12 +378,19 @@ public class ReminderFragment extends Fragment {
         return report;
     }
 
+    private void updateDate() {
+        if (mReminder.getNotification() != null) {
+            mCalendarIcon.setVisibility(View.VISIBLE);
+            mDateTextView.setText(DateFormat.getDateInstance().format(mReminder.getDate()) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(mReminder.getDate()));
+        }
+    }
+
     private void updatePhoto() {
         if (mPhotoFile == null || !mPhotoFile.exists()) {
             mPhotoImageView.setImageDrawable(null);
             mPhotoImageView.setVisibility(View.GONE);
         } else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), requireActivity());
             mPhotoImageView.setImageBitmap(bitmap);
             mPhotoImageView.setVisibility(View.VISIBLE);
         }

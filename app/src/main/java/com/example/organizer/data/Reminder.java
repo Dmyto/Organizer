@@ -1,11 +1,11 @@
 package com.example.organizer.data;
 
-import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
 public class Reminder {
     private UUID uuid;
+    private Long uuidReminder;
     private String title;
     private String details;
     private Date mDate;
@@ -14,7 +14,6 @@ public class Reminder {
     private boolean notification;
     private Double latitude;
     private Double longitude;
-    private String qrCode;
 
     public Reminder() {
         this(UUID.randomUUID());
@@ -31,6 +30,14 @@ public class Reminder {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public Long getUuidReminder() {
+        return uuidReminder;
+    }
+
+    public void setUuidReminder(Long uuidReminder) {
+        this.uuidReminder = uuidReminder;
     }
 
     public String getTitle() {
@@ -95,14 +102,6 @@ public class Reminder {
 
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
-    }
-
-    public String getQrCode() {
-        return qrCode;
-    }
-
-    public void setQrCode(String qrCode) {
-        this.qrCode = qrCode;
     }
 
     public void setLongitude(Double longitude) {

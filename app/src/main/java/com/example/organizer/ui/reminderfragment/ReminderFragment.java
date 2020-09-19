@@ -1,5 +1,6 @@
 package com.example.organizer.ui.reminderfragment;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -7,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -15,11 +17,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,9 +50,11 @@ public class ReminderFragment extends Fragment {
     private EditText mTitleField, mDetailsField;
     private TextView mContactInfo, mPositionEditText, mDateTextView;
 
+    private LinearLayout choseTimeLinearLayout;
+
     private ImageButton mCallContactButton;
 
-    private ImageView mPhotoImageView, mMarkerImageView, mCalendarIcon;
+    private ImageView mPhotoImageView, mMarkerImageView;
 
     private File mPhotoFile;
 
@@ -68,7 +71,6 @@ public class ReminderFragment extends Fragment {
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
     private static final int REQUEST_PHOTO = 3;
-    private static final int REQUEST_CALENDAR = 4;
 
     public static ReminderFragment newInstance(UUID uuid) {
         Bundle args = new Bundle();
@@ -109,8 +111,6 @@ public class ReminderFragment extends Fragment {
         mCallContactButton = view.findViewById(R.id.call_to_contact_button);
         mContactInfo = view.findViewById(R.id.contact_info);
 
-        mCalendarIcon = view.findViewById(R.id.ic_calendar);
-
         mTitleField = view.findViewById(R.id.reminder_title);
         mDetailsField = view.findViewById(R.id.reminder_notes);
         mPositionEditText = view.findViewById(R.id.position_coordinates);
@@ -120,6 +120,15 @@ public class ReminderFragment extends Fragment {
 
         mTitleField.setText(mReminder.getTitle());
         mDetailsField.setText(mReminder.getDetails());
+
+        choseTimeLinearLayout = view.findViewById(R.id.choose_time);
+
+        choseTimeLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                datePicker();
+            }
+        });
 
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -234,7 +243,7 @@ public class ReminderFragment extends Fragment {
         mNotificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                datePicker();
+                calendarReminder();
             }
         });
 
@@ -255,18 +264,6 @@ public class ReminderFragment extends Fragment {
             }
         });
 
-
-        if (mReminder.getNotification()) {
-            mCalendarIcon.setImageResource(R.drawable.ic_baseline_calendar_today_24_color);
-        }
-
-        mCalendarIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                calendarReminder() ;
-            }
-        });
-
         return view;
     }
 
@@ -281,7 +278,7 @@ public class ReminderFragment extends Fragment {
     }
 
     private void mapDialog() {
-        FragmentManager fragmentManager = getChildFragmentManager();
+        FragmentManager fragmentManager = getFragmentManager();
         DetailsViewerFragment dialog = DetailsViewerFragment.newInstance(mReminder.getLongitude(), mReminder.getLatitude());
         dialog.setTargetFragment(ReminderFragment.this, REQUEST_DATE);
         dialog.show(fragmentManager, DIALOG_DATE);
@@ -302,18 +299,39 @@ public class ReminderFragment extends Fragment {
     }
 
     private void calendarReminder() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(mReminder.getDate());
-        Intent intent = new Intent(Intent.ACTION_EDIT);
-        intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra("beginTime", cal.getTimeInMillis());
-        intent.putExtra("allDay", false);
-        intent.putExtra("rrule", "FREQ=DAILY");
-        intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
-        intent.putExtra("title", "A Test Event from android app");
-        startActivity(intent);
+        if (mReminder.getNotification()) {
+            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, mReminder.getUuidReminder());
+            Intent intent = new Intent(Intent.ACTION_EDIT).setData(uri);
+            intent.putExtra(CalendarContract.Events.TITLE, mReminder.getTitle());
+            startActivity(intent);
+        } else {
+
+            Long id = generateUniqueId();
+
+            mReminder.setUuidReminder(id);
+            mReminder.setNotification(true);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(mReminder.getDate());
+            Intent intent = new Intent(Intent.ACTION_EDIT);
+            intent.setType("vnd.android.cursor.item/event");
+            intent.putExtra("beginTime", cal.getTimeInMillis());
+            intent.putExtra(CalendarContract.Reminders.EVENT_ID, id);
+            intent.putExtra("allDay", false);
+            intent.putExtra("rule", "FREQ=NEVER");
+            intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
+            intent.putExtra("title", mReminder.getTitle());
+            startActivity(intent);
+        }
     }
 
+    private Long generateUniqueId() {
+        long val = -1;
+        do {
+            val = UUID.randomUUID().getMostSignificantBits();
+        } while (val < 0);
+        return val;
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -327,7 +345,6 @@ public class ReminderFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             mReminder.setDate(date);
             updateDate();
-            calendarReminder();
         } else if (requestCode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData();
             String[] queryFields = new String[]{
@@ -380,7 +397,6 @@ public class ReminderFragment extends Fragment {
 
     private void updateDate() {
         if (mReminder.getNotification() != null) {
-            mCalendarIcon.setVisibility(View.VISIBLE);
             mDateTextView.setText(DateFormat.getDateInstance().format(mReminder.getDate()) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(mReminder.getDate()));
         }
     }

@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public class ReminderLab {
     private static ReminderLab reminderLab;
-    private List<Reminder> reminders;
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
@@ -103,7 +102,7 @@ public class ReminderLab {
         values.put(ReminderDBSchema.ReminderTable.Cols.NOTIFICATION, reminder.getNotification() ? 1 : 0);
         values.put(ReminderDBSchema.ReminderTable.Cols.LATITUDE, reminder.getLatitude());
         values.put(ReminderDBSchema.ReminderTable.Cols.LONGITUDE, reminder.getLongitude());
-        values.put(ReminderDBSchema.ReminderTable.Cols.QR_CODE, reminder.getQrCode());
+        values.put(ReminderDBSchema.ReminderTable.Cols.UUID_REMINDER, reminder.getUuidReminder());
 
         return values;
     }

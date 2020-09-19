@@ -67,8 +67,8 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             case R.id.new_reminder:
                 Reminder reminder = new Reminder();
                 ReminderLab.get(getActivity()).addReminder(reminder);
-                updateUI();
                 mCallbacks.onCrimeSelected(reminder);
+                updateUI();
                 break;
         }
         return true;
@@ -84,6 +84,7 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             @Override
             public void onClick(View view) {
                 Reminder reminder = new Reminder();
+                reminder.setTitle(getString(R.string.title_task_number, (reminderAdapter.getItemCount() + 1)));
                 ReminderLab.get(getActivity()).addReminder(reminder);
                 updateUI();
                 mCallbacks.onCrimeSelected(reminder);

@@ -1,5 +1,6 @@
 package com.example.organizer.ui.reminderfragment;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,6 +16,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -35,7 +40,16 @@ import com.example.organizer.R;
 import com.example.organizer.data.PictureUtils;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.data.ReminderLab;
+import com.example.organizer.ui.reminderfragment.dialogfragments.DatePickerFragment;
+import com.example.organizer.ui.reminderfragment.dialogfragments.DetailsViewerFragment;
+import com.example.organizer.ui.reminderfragment.dialogfragments.PhotoViewerFragment;
+import com.example.organizer.ui.reminderfragment.dialogfragments.TimePickerFragment;
 import com.github.clans.fab.FloatingActionButton;
+
+import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.zxing.integration.android.IntentIntegrator;
 
 import java.io.File;
@@ -44,6 +58,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 public class ReminderFragment extends Fragment {
     private Reminder mReminder;
@@ -58,7 +75,7 @@ public class ReminderFragment extends Fragment {
 
     private File mPhotoFile;
 
-    private FloatingActionButton mShareButton, mAddContactButton, mAddPhotoButton, mNotificationButton;
+    private FloatingActionButton mAddLocationButton, mAddContactButton, mAddPhotoButton, mNotificationButton;
 
     private NotificationManagerCompat mNotificationManagerCompat;
 
@@ -66,11 +83,13 @@ public class ReminderFragment extends Fragment {
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
     private static final String DIALOG_VIEWER = "DialogView";
+    private static final String DIALOG_LOCATION_PICKER = "DialogLocationPicker";
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
     private static final int REQUEST_PHOTO = 3;
+    private static final int REQUEST_PICK_PLACE = 4;
 
     public static ReminderFragment newInstance(UUID uuid) {
         Bundle args = new Bundle();
@@ -96,6 +115,7 @@ public class ReminderFragment extends Fragment {
         ReminderLab.get(getActivity()).updateReminder(mReminder);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -103,7 +123,7 @@ public class ReminderFragment extends Fragment {
 
         mAddContactButton = view.findViewById(R.id.add_contact_reminder_button);
         mAddPhotoButton = view.findViewById(R.id.add_photo_reminder_button);
-        mShareButton = view.findViewById(R.id.share_reminder_button);
+        mAddLocationButton = view.findViewById(R.id.add_location__reminder_button);
         mNotificationButton = view.findViewById(R.id.notification_reminder_button);
 
         mDateTextView = view.findViewById(R.id.reminder_date_text);
@@ -166,41 +186,22 @@ public class ReminderFragment extends Fragment {
 
         updateDate();
 
-        mPhotoImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager fragmentManager = getFragmentManager();
-                PhotoViewerFragment dialog = PhotoViewerFragment.newInstance(mPhotoFile);
-                dialog.setTargetFragment(ReminderFragment.this, REQUEST_PHOTO);
-                dialog.show(fragmentManager, DIALOG_VIEWER);
+        mPhotoImageView.setOnClickListener(v -> openImage());
+
+        mAddLocationButton.setOnTouchListener((view1, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                addLocation();
             }
+            return false;
         });
 
-        mShareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String mimeType = "text/plain";
-
-                Intent intent = ShareCompat.IntentBuilder.from(requireActivity())
-                        .setType(mimeType)
-                        .setText(getReminderreport())
-                        .getIntent();
-                startActivity(intent);
+        mCallContactButton.setOnClickListener(v -> {
+            if (mReminder.getContactNumber() != null) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL,
+                        Uri.fromParts("tel", mReminder.getContactNumber(), null));
+                startActivity(callIntent);
             }
-        });
 
-
-        mCallContactButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mReminder.getContactNumber() != null) {
-                    Intent callIntent = new Intent(Intent.ACTION_DIAL,
-                            Uri.fromParts("tel", mReminder.getContactNumber(), null));
-                    startActivity(callIntent);
-                }
-
-            }
         });
 
         final Uri uriCont = Uri.parse("content://contacts");
@@ -214,12 +215,13 @@ public class ReminderFragment extends Fragment {
         });
 
         if (mReminder.getContact() != null && mReminder.getContactNumber() != null) {
-            mContactInfo.setText(mReminder.getContact() + "\n" + mReminder.getContactNumber());
+            mContactInfo.setText(getString(R.string.contact_info, mReminder.getContact(), mReminder.getContactNumber()));
+//            mContactInfo.setText(mReminder.getContact() + "\n" + mReminder.getContactNumber());
             mContactInfo.setVisibility(View.VISIBLE);
             mCallContactButton.setVisibility(View.VISIBLE);
         }
 
-        PackageManager packageManager = getActivity().getPackageManager();
+        PackageManager packageManager = requireActivity().getPackageManager();
 
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -231,10 +233,10 @@ public class ReminderFragment extends Fragment {
             public void onClick(View v) {
                 Uri uri = FileProvider.getUriForFile(requireActivity(), "com.example.orgaziner.data.fileprovider", mPhotoFile);
                 captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-                List<ResolveInfo> cameraActivities = getActivity().getPackageManager().queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY);
+                List<ResolveInfo> cameraActivities = requireActivity().getPackageManager().queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY);
 
                 for (ResolveInfo activity : cameraActivities) {
-                    getActivity().grantUriPermission(activity.activityInfo.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    requireActivity().grantUriPermission(activity.activityInfo.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 }
                 startActivityForResult(captureImage, REQUEST_PHOTO);
             }
@@ -254,7 +256,6 @@ public class ReminderFragment extends Fragment {
             mPositionEditText.setText(mReminder.getLatitude() + " " + mReminder.getLongitude());
             mPositionEditText.setVisibility(View.VISIBLE);
             mMarkerImageView.setVisibility(View.VISIBLE);
-
         }
 
         mMarkerImageView.setOnClickListener(new View.OnClickListener() {
@@ -264,7 +265,31 @@ public class ReminderFragment extends Fragment {
             }
         });
 
+        setHasOptionsMenu(true);
+
         return view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share_reminder_button:
+                String mimeType = "text/plain";
+
+                Intent intent = ShareCompat.IntentBuilder.from(requireActivity())
+                        .setType(mimeType)
+                        .setText(getReminderreport())
+                        .getIntent();
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.reminder_menu, menu);
     }
 
     private void qrCodeScan() {
@@ -278,24 +303,31 @@ public class ReminderFragment extends Fragment {
     }
 
     private void mapDialog() {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         DetailsViewerFragment dialog = DetailsViewerFragment.newInstance(mReminder.getLongitude(), mReminder.getLatitude());
         dialog.setTargetFragment(ReminderFragment.this, REQUEST_DATE);
         dialog.show(fragmentManager, DIALOG_DATE);
     }
 
     private void datePicker() {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         DatePickerFragment dialog = DatePickerFragment.newInstance(mReminder.getDate());
         dialog.setTargetFragment(ReminderFragment.this, REQUEST_DATE);
         dialog.show(fragmentManager, DIALOG_DATE);
     }
 
     private void timePicker() {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         TimePickerFragment dialog = TimePickerFragment.newInstance(mReminder.getDate());
         dialog.setTargetFragment(ReminderFragment.this, REQUEST_TIME);
         dialog.show(fragmentManager, DIALOG_TIME);
+    }
+
+    private void openImage() {
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        PhotoViewerFragment dialog = PhotoViewerFragment.newInstance(mPhotoFile);
+        dialog.setTargetFragment(ReminderFragment.this, REQUEST_PHOTO);
+        dialog.show(fragmentManager, DIALOG_VIEWER);
     }
 
     private void calendarReminder() {
@@ -323,6 +355,13 @@ public class ReminderFragment extends Fragment {
             intent.putExtra("title", mReminder.getTitle());
             startActivity(intent);
         }
+    }
+
+    private void addLocation() {
+//        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+//        PickAddressFragment dialog = new PickAddressFragment();
+//        dialog.setTargetFragment(ReminderFragment.this, REQUEST_PICK_PLACE);
+//        dialog.show(fragmentManager, DIALOG_LOCATION_PICKER);
     }
 
     private Long generateUniqueId() {
@@ -369,8 +408,19 @@ public class ReminderFragment extends Fragment {
             }
         } else if (requestCode == REQUEST_PHOTO && data != null) {
             Uri uri = FileProvider.getUriForFile(requireActivity(), "com.example.orgaziner.data.fileprovider", mPhotoFile);
-            getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            requireActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             updatePhoto();
+        } else if (requestCode == REQUEST_PICK_PLACE && data != null) {
+            if (resultCode == RESULT_OK) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                Log.i("TAG", "Place: " + place.getName() + ", " + place.getId());
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                // TODO: Handle the error.
+                Status status = Autocomplete.getStatusFromIntent(data);
+                Log.i("TAG", status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
         }
     }
 
@@ -411,4 +461,6 @@ public class ReminderFragment extends Fragment {
             mPhotoImageView.setVisibility(View.VISIBLE);
         }
     }
+
+
 }

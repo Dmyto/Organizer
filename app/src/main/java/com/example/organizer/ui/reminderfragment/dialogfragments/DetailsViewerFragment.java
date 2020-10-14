@@ -1,9 +1,10 @@
-package com.example.organizer.ui.reminderfragment;
+package com.example.organizer.ui.reminderfragment.dialogfragments;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -16,19 +17,15 @@ import com.example.organizer.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.Objects;
 
 public class DetailsViewerFragment extends DialogFragment implements OnMapReadyCallback {
     private static final String ARG_LONGITUDE = "longitude";
     private static final String ARG_LATITUDE = "latitude";
 
     private EditText mPositionEditText;
-
 
     public static DetailsViewerFragment newInstance(Double longitude, Double latitude) {
         Bundle args = new Bundle();
@@ -40,18 +37,18 @@ public class DetailsViewerFragment extends DialogFragment implements OnMapReadyC
         return fragment;
     }
 
-    @Nullable
+    @NonNull
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_details_map,
                 null);
 
         mPositionEditText = view.findViewById(R.id.position_title_dialog);
-        SupportMapFragment mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
 
-        return view;
+        return new AlertDialog.Builder(getActivity())
+                .setView(view)
+                .create();
     }
 
     @Override
@@ -63,6 +60,7 @@ public class DetailsViewerFragment extends DialogFragment implements OnMapReadyC
 
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
+
         LatLng latLng = new LatLng(latitude, longitude);
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
@@ -72,18 +70,14 @@ public class DetailsViewerFragment extends DialogFragment implements OnMapReadyC
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         googleMap.addMarker(markerOptions);
-
     }
-
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        assert getFragmentManager() != null;
         Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
         FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.remove(fragment);
         fragmentTransaction.commit();
-
     }
 }

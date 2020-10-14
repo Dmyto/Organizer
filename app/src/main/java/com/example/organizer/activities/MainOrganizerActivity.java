@@ -2,14 +2,11 @@ package com.example.organizer.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.example.organizer.R;
 import com.example.organizer.data.Reminder;
 import com.example.organizer.ui.reminderfragment.ReminderFragment;
 import com.example.organizer.ui.reminderlistfragment.ReminderListFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.appcompat.widget.Toolbar;
@@ -34,7 +31,7 @@ public class MainOrganizerActivity extends SingleFragmentActivity implements Rem
     }
 
     @Override
-    public void onCrimeSelected(Reminder reminder) {
+    public void onReminderSelected(Reminder reminder) {
         if (findViewById(R.id.detail_fragment_container) == null) {
             Intent intent = ReminderPagerActivity.newIntent(this, reminder.getUuid());
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -20,14 +20,18 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.example.organizer.R;
+import com.example.organizer.data.Reminder;
+import com.example.organizer.data.ReminderLab;
+import com.example.organizer.ui.reminderlistfragment.ReminderListFragment;
+
+import java.util.List;
 
 
 public class WebFragment extends DialogFragment {
 
+
     private static final String ARG_LINK = "link";
     public static final String ARG_TITLE = "title";
-
-//    private ProgressBar progressBar;
 
     public static WebFragment newInstance(String link, String title) {
         Bundle args = new Bundle();
@@ -42,10 +46,12 @@ public class WebFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Dialog d = getDialog();
-        if (d != null) {
-            d.getWindow().setLayout(ActionBar.LayoutParams.FILL_PARENT, ActionBar.LayoutParams.FILL_PARENT);
-        }
+
+    }
+
+    @Override
+    public int getTheme() {
+        return R.style.DialogTheme;
     }
 
     @NonNull
@@ -60,7 +66,7 @@ public class WebFragment extends DialogFragment {
 
         WebView webView = (WebView) v.findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
-        webView.getSettings().setJavaScriptEnabled(true); //enable advertising)))
+        webView.getSettings().setJavaScriptEnabled(false); //enable advertising)))
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -79,13 +85,14 @@ public class WebFragment extends DialogFragment {
         return new AlertDialog.Builder(getActivity())
                 .setView(v)
                 .setTitle(title)
-                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                })
                 .create();
+    }
+
+    private void updateUI() {
+        ReminderLab reminderLab = ReminderLab.get(getActivity());
+        List<Reminder> reminders = reminderLab.getReminders();
+
+
     }
 
 

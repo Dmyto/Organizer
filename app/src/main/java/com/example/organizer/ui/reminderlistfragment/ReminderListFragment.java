@@ -1,12 +1,8 @@
 package com.example.organizer.ui.reminderlistfragment;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -26,7 +22,6 @@ import com.example.organizer.helper.ItemTouchHelperAdapter;
 import com.example.organizer.helper.OnStartDragListener;
 import com.example.organizer.helper.SimpleItemTouchHelperCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.text.DateFormat;
 import java.util.Collections;
@@ -40,7 +35,7 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
     private ProgressBar mProgressBar;
 
     public interface Callbacks {
-        void onCrimeSelected(Reminder reminder);
+        void onReminderSelected(Reminder reminder);
     }
 
     @Override
@@ -53,25 +48,6 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
     public void onDetach() {
         super.onDetach();
         mCallbacks = null;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.reminder_list_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.new_reminder:
-                Reminder reminder = new Reminder();
-                ReminderLab.get(getActivity()).addReminder(reminder);
-                mCallbacks.onCrimeSelected(reminder);
-                updateUI();
-                break;
-        }
-        return true;
     }
 
     @Nullable
@@ -87,7 +63,7 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
                 reminder.setTitle(getString(R.string.title_task_number, (reminderAdapter.getItemCount() + 1)));
                 ReminderLab.get(getActivity()).addReminder(reminder);
                 updateUI();
-                mCallbacks.onCrimeSelected(reminder);
+                mCallbacks.onReminderSelected(reminder);
             }
         });
 
@@ -112,7 +88,6 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             reminderAdapter.setReminders(reminders);
             reminderAdapter.notifyDataSetChanged();
         }
-
     }
 
     @Override
@@ -156,15 +131,12 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
             mReminders = reminders;
         }
 
-
         @Override
         public void onItemDismiss(int position) {
-
             Reminder reminder = mReminders.get(position);
             mReminders.remove(position);
             ReminderLab.get(getActivity()).deleteReminder(reminder);
             notifyItemRemoved(position);
-
         }
 
         @Override
@@ -175,13 +147,11 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
         }
     }
 
-
     private class ReminderHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mTitleTextView;
         private TextView mDateTextView;
         private Reminder mReminder;
-
 
         public ReminderHolder(LayoutInflater layoutInflater, ViewGroup parent) {
             super(layoutInflater.inflate(R.layout.list_item_reminder, parent, false));
@@ -198,7 +168,7 @@ public class ReminderListFragment extends Fragment implements OnStartDragListene
 
         @Override
         public void onClick(View v) {
-            mCallbacks.onCrimeSelected(mReminder);
+            mCallbacks.onReminderSelected(mReminder);
         }
     }
 }

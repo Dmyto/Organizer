@@ -38,11 +38,9 @@ public class NewsListFragment extends Fragment {
             public void onItemClick(View v, int position) {
                 Post post = adapter.getPostAtPosition(position);
 
-//                Navigation.findNavController(v).navigate(NewsListFragmentDirections.actionNewsListToWebFragment(post.getLink()));
-
                 FragmentManager fragmentManager = getFragmentManager();
-                WebFragment dialog = WebFragment.newInstance(post.getLink(),post.getTitle());
-                dialog.setTargetFragment(NewsListFragment.this,22);
+                WebFragment dialog = WebFragment.newInstance(post.getLink(), post.getTitle());
+                dialog.setTargetFragment(NewsListFragment.this, 22);
                 dialog.show(fragmentManager, "mmm");
 
             }
